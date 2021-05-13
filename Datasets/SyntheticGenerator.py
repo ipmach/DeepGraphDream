@@ -129,8 +129,8 @@ class WrapperSynthetic:
         :param number_classes: number of classes
         """
         self.dataset = datasets
-        self.number_nodes_features = number_nodes_features
-        self.number_classes = number_classes
+        self.num_node_features = number_nodes_features
+        self.num_classes = number_classes
 
     def __getitem__(self, item):
         """
@@ -150,7 +150,8 @@ class WrapperSynthetic:
     def shuffle(self):
         """
         Shuffle list
-        :return:
+        :return: the object
         """
         random.shuffle(self.dataset)
+        return self
 
