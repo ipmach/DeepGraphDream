@@ -1,6 +1,7 @@
 from torch_geometric.utils import dense_to_sparse
 from torch_geometric import data
 import numpy as np
+import random
 import torch
 
 
@@ -9,6 +10,7 @@ class SyntheticGenerator:
     def __init__(self):
 
         self.num_nodes = 9  # all graphs have exactly 9 nodes
+        self.classes = 2  # Number of classes
 
         # define base graph shapes
         # cross graph (shaped like X)
@@ -114,4 +116,41 @@ class SyntheticGenerator:
             self.generate_graphs(self.crossAdj, self.cross_label, int(num_samples / 2))
             self.generate_graphs(self.snowflakeAdj, self.snowflake_label, int(num_samples / 2))
 
-        return self.synthetic_dataset
+        return WrapperSynthetic(self.synthetic_dataset, self.num_nodes, self.classes)
+
+
+class WrapperSynthetic:
+
+    def __init__(self, datasets, number_nodes_features, number_classes):
+        """
+        Wrapper for Synthetic dataset
+        :param datasets: list dataset
+        :param number_nodes_features: number of features per node
+        :param number_classes: number of classes
+        """
+        self.dataset = datasets
+        self.number_nodes_features = number_nodes_features
+        self.number_classes = number_classes
+
+    def __getitem__(self, item):
+        """
+        Get graph from dataset
+        :param item: index item
+        :return: graph
+        """
+        return self.dataset[item]
+
+    def __len__(self):
+        """
+        Return size of the dataset
+        :return: size of the dataset
+        """
+        return len(self.dataset)
+
+    def shuffle(self):
+        """
+        Shuffle list
+        :return:
+        """
+        random.shuffle(self.dataset)
+
