@@ -24,6 +24,7 @@ class Problem(Problem_Interface):
         self.model = model
         self.index = index
         self.weights_size = weights_size
+        self.always_multiple = False
 
     def give_random_point(self):
         """
@@ -92,7 +93,7 @@ class Problem(Problem_Interface):
         :param real: return real value or flip value (metaheuristics minimize not maximize)
         :return:
         """
-        if type(x[0]).__module__ == np.__name__:  # check if returns a list of arrays
+        if multiple or self.always_multiple:  # check if returns a list of arrays
             results = []
             for i in x:
                 results.append(self.solve(i, real=real))
