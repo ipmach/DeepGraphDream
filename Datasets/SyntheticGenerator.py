@@ -14,35 +14,35 @@ class SyntheticGenerator:
 
         # define base graph shapes
         # cross graph (shaped like X)
-        self.crossAdj = np.array([[0, 1, 0, 1, 0, 1, 0, 1, 0],
-                                  [1, 0, 1, 0, 0, 0, 0, 0, 0],
-                                  [0, 1, 0, 0, 0, 0, 0, 0, 0],
-                                  [1, 0, 0, 0, 1, 0, 0, 0, 0],
-                                  [0, 0, 0, 1, 0, 0, 0, 0, 0],
-                                  [1, 0, 0, 0, 0, 0, 1, 0, 0],
-                                  [0, 0, 0, 0, 0, 1, 0, 0, 0],
-                                  [1, 0, 0, 0, 0, 0, 0, 0, 1],
-                                  [0, 0, 0, 0, 0, 0, 0, 1, 0]])
+        self.crossAdj = np.array([[0,1,0,1,0,1,0,1,0],
+                                  [0,0,1,0,0,0,0,0,0],
+                                  [0,0,0,0,0,0,0,0,0],
+                                  [0,0,0,0,1,0,0,0,0],
+                                  [0,0,0,0,0,0,0,0,0],
+                                  [0,0,0,0,0,0,1,0,0],
+                                  [0,0,0,0,0,0,0,0,0],
+                                  [0,0,0,0,0,0,0,0,1],
+                                  [0,0,0,0,0,0,0,0,0]])
         # snowflake graph (shaped like *)
-        self.snowflakeAdj = np.array([[0, 1, 1, 1, 1, 1, 1, 1, 1],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0],
-                                      [1, 0, 0, 0, 0, 0, 0, 0, 0]])
+        self.snowflakeAdj = np.array([[0,1,1,1,1,1,1,1,1],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0]])
         # circle graph (shaped like O, currently unused)
-        self.circleAdj = np.array([[0, 1, 0, 0, 0, 0, 0, 0, 1],
-                                   [1, 0, 1, 0, 0, 0, 0, 0, 0],
-                                   [0, 1, 0, 1, 0, 0, 0, 0, 0],
-                                   [0, 0, 1, 0, 1, 0, 0, 0, 0],
-                                   [0, 0, 0, 1, 0, 1, 0, 0, 0],
-                                   [0, 0, 0, 0, 1, 0, 1, 0, 0],
-                                   [0, 0, 0, 0, 0, 1, 0, 1, 0],
-                                   [0, 0, 0, 0, 0, 0, 1, 0, 1],
-                                   [1, 0, 0, 0, 0, 0, 0, 1, 0]])
+        self.circleAdj = np.array([[0,1,0,0,0,0,0,0,1],
+                                   [0,0,1,0,0,0,0,0,0],
+                                   [0,0,0,1,0,0,0,0,0],
+                                   [0,0,0,0,1,0,0,0,0],
+                                   [0,0,0,0,0,1,0,0,0],
+                                   [0,0,0,0,0,0,1,0,0],
+                                   [0,0,0,0,0,0,0,1,0],
+                                   [0,0,0,0,0,0,0,0,1],
+                                   [0,0,0,0,0,0,0,0,0]])
         # define labels
         self.cross_label = torch.tensor([0])
         self.snowflake_label = torch.tensor([1])
@@ -107,14 +107,14 @@ class SyntheticGenerator:
                     cross_adj = self.permute(cross_adj, self.cyclic)
                 self.generate_graphs(cross_adj, self.cross_label, int(num_samples / (2 * self.num_nodes)))
 
-            snowflake_adj = np.copy(self.snowflakeAdj)
+            snowflake_adj = np.copy(self.circleAdj)
             for i in range(self.num_nodes):
                 if i != 0:
                     snowflake_adj = self.permute(snowflake_adj, self.cyclic)
                 self.generate_graphs(snowflake_adj, self.snowflake_label, int(num_samples / (2 * self.num_nodes)))
         else:
             self.generate_graphs(self.crossAdj, self.cross_label, int(num_samples / 2))
-            self.generate_graphs(self.snowflakeAdj, self.snowflake_label, int(num_samples / 2))
+            self.generate_graphs(self.circleAdj, self.snowflake_label, int(num_samples / 2))
 
         return WrapperSynthetic(self.synthetic_dataset, self.num_nodes, self.classes)
 
