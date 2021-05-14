@@ -108,8 +108,8 @@ class NonEncode:
         """
         Use as encode for some of the metaheuristics
         """
-        self.dec2binv = lambda x: self.dec2bin(x)
-        self.bin2decv = lambda x: self.bin2dec(x)
+        self.dec2binv = lambda x: [self.dec2bin(i) for i in x]
+        self.bin2decv = lambda x: [self.bin2dec(i) for i in x]
 
     def dec2bin(self, x):
         """
@@ -117,6 +117,7 @@ class NonEncode:
         :param x: point in the problem space
         :return: point in the metaheuristic encoding
         """
+        x = np.array(x)
         return "".join(list(x.astype(str)))
 
     def bin2dec(self, x):
