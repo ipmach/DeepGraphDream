@@ -39,7 +39,7 @@ class Dreamer(torch.nn.Module):
 
         for i in range(steps):
           #print(i)
-          current_softmax = sftmax(model(example.x, example.edge_index, batch, edge_weight=mask))
+          current_softmax = sftmax(model(x.x, x.edge_index, batch, edge_weight=mask))
 
           # Assumming model to be a binary classifier
           softmax_zero.append(current_softmax[0, 0])
