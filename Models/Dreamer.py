@@ -17,16 +17,17 @@ class Dreamer(torch.nn.Module):
         self.activation[name] = o
       return hook
 
-    def forward(self, x, nodes,target_label, random_mask=False, steps=400):
+    def forward(self, x, nodes, target_label, mask=None, random_mask=False, steps=400):
         model = self.model
         batch = torch.zeros([nodes]).type(torch.int64)
         print(batch.shape)
         sftmax = torch.nn.Softmax()
         out = sftmax(model(x.x, x.edge_index, batch))
         print("initial prediction {}".format(out))
-        mask = torch.ones(x.edge_index.shape[1], requires_grad=True)*0.5
-        if random_mask:
-            mask += (torch.rand(x.edge_index.shape[1]) - 0.01)*0.3
+        if mask is None: #allow for user providing different weights
+            mask = torch.ones(x.edge_index.shape[1], requires_grad=True)*0.5
+            if random_mask:
+                mask += (torch.rand(x.edge_index.shape[1]) - 0.01)*0.3
 
         model.eval()
         print("initial weights")
