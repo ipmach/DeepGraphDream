@@ -26,7 +26,7 @@ class Dreamer(torch.nn.Module):
         print("initial prediction {}".format(out))
         mask = torch.ones(x.edge_index.shape[1], requires_grad=True)*0.5
         if random_mask:
-            mask += (torch.rand(example.edge_index.shape[1]) - 0.01)*0.3
+            mask += (torch.rand(x.edge_index.shape[1]) - 0.01)*0.3
 
         model.eval()
         print("initial weights")
