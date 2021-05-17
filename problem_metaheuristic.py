@@ -1,4 +1,5 @@
 from MetaHeuristics.Problems.interface_problem import Problem_Interface
+from sklearn.metrics.pairwise import euclidean_distances
 import numpy as np
 import torch
 
@@ -10,7 +11,7 @@ class Problem(Problem_Interface):
         https://github.com/ipmach/MetaHeuristics.git
     """
 
-    def __init__(self, graph, batch, model, index, weights_size):
+    def __init__(self, graph, batch, model, index, weights_size, solver):
         """
         Class adapter
         :param graph: target graph
@@ -18,6 +19,7 @@ class Problem(Problem_Interface):
         :param model: model used
         :param index: index of last layer neuron
         :param weights_size: numbers of the edges weights
+        :param solver: solver function use
         """
         self.graph = graph
         self.batch = batch
@@ -25,6 +27,7 @@ class Problem(Problem_Interface):
         self.index = index
         self.weights_size = weights_size
         self.always_multiple = False
+        self.solver = solver
 
     def give_random_point(self):
         """
@@ -82,8 +85,7 @@ class Problem(Problem_Interface):
         :return: solution
         """
         i = 1 if real else -1  # The original heuristic are minimizing
-        return i * float(self.model(self.graph.x, self.graph.edge_index, self.batch,
-                                    torch.Tensor(x))[0][self.index].detach().numpy())
+        return i * self.solver(self.model, self.graph, self.batch, self.index, x)
 
     def __call__(self, x, multiple=False, real=False):
         """
@@ -127,3 +129,41 @@ class NonEncode:
         :return: point in the problem space
         """
         return np.array(list(x)).astype(int)
+
+
+def find_indeces(graph, edge_index):
+  aux = graph.edge_index.T
+  indeces = []
+  for j in range(len(aux)):
+      indeces.append(np.nonzero([bool(torch.all(i)) for i in edge_index.T == aux[j]])[0][0])
+  values = np.zeros(len(edge_index.T)).astype(int)
+  values[indeces] = np.ones(len(indeces))
+  return values
+
+
+def initialize_indeces(nodes):
+    edge = []
+    for i in range(nodes):
+      for j in range(nodes):
+        edge.append([i, j])
+    return torch.tensor(edge).T
+
+
+def conver_edges(index, edge_index):
+    aux = []
+    for j, i in enumerate(index):
+      if i:
+          aux.append(edge_index.T[j].detach().numpy())
+    return torch.tensor(aux).T
+
+
+def score(old, new, index):
+    d = euclidean_distances(old.detach().numpy(), new.detach().numpy())[0][0]
+    c = 1 if new[0][index] < old[0][index] else -1
+    return c * (d / np.sqrt(2))
+
+
+def solver(model, graph, batch, index, x):
+    return float(model(graph.x, conver_edges(x), batch)[0][0])
+
+
