@@ -1,7 +1,5 @@
 from MetaHeuristics.Problems.interface_problem import Problem_Interface
-from sklearn.metrics.pairwise import euclidean_distances
 import numpy as np
-import torch
 
 
 class Problem(Problem_Interface):
@@ -102,68 +100,4 @@ class Problem(Problem_Interface):
             return results
         else:
             return self.solve(x, real=real)
-
-
-class NonEncode:
-
-    def __init__(self):
-        """
-        Use as encode for some of the metaheuristics
-        """
-        self.dec2binv = lambda x: [self.dec2bin(i) for i in x]
-        self.bin2decv = lambda x: [self.bin2dec(i) for i in x]
-
-    def dec2bin(self, x):
-        """
-        Convert from space problem to metaheuristic encoding
-        :param x: point in the problem space
-        :return: point in the metaheuristic encoding
-        """
-        x = np.array(x)
-        return "".join(list(x.astype(str)))
-
-    def bin2dec(self, x):
-        """
-        Convert from metaheuristic encoding to space problem
-        :param x: point in the metaheuristic encoding
-        :return: point in the problem space
-        """
-        return np.array(list(x)).astype(int)
-
-
-def find_indeces(graph, edge_index):
-  aux = graph.edge_index.T
-  indeces = []
-  for j in range(len(aux)):
-      indeces.append(np.nonzero([bool(torch.all(i)) for i in edge_index.T == aux[j]])[0][0])
-  values = np.zeros(len(edge_index.T)).astype(int)
-  values[indeces] = np.ones(len(indeces))
-  return values
-
-
-def initialize_indeces(nodes):
-    edge = []
-    for i in range(nodes):
-      for j in range(nodes):
-        edge.append([i, j])
-    return torch.tensor(edge).T
-
-
-def conver_edges(index, edge_index):
-    aux = []
-    for j, i in enumerate(index):
-      if i:
-          aux.append(edge_index.T[j].detach().numpy())
-    return torch.tensor(aux).T
-
-
-def score(old, new, index):
-    d = euclidean_distances(old.detach().numpy(), new.detach().numpy())[0][0]
-    c = 1 if new[0][index] < old[0][index] else -1
-    return c * (d / np.sqrt(2))
-
-
-def solver(model, graph, batch, index, x):
-    return float(model(graph.x, conver_edges(x), batch)[0][0])
-
 
