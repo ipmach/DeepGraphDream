@@ -87,22 +87,26 @@ class SyntheticGenerator:
         if mutate:
             adj = np.copy(base_graph)
         else:
-            adj = np.copy(int(base_graph))  # adjacency matrix
+            adj = np.copy(np.round(base_graph))  # adjacency matrix
 
         for i in range(num_samples):  # generate samples and append to dataset
-            edge_index, _ = dense_to_sparse(torch.bernoulli(torch.tensor(adj)))  # adjacency list
+            if not mutate:
+              edge_index, _ = dense_to_sparse(torch.tensor(adj))
+            else:
+              edge_index, _ = dense_to_sparse(torch.bernoulli(torch.tensor(adj)))  # adjacency list
             graph = data.Data(x=torch.rand(self.num_nodes, self.num_nodes),
                               edge_index=edge_index,
                               edge_attr=self.identity,
                               y=label)
             self.synthetic_dataset.append(graph)
 
-    def generate(self, num_samples=5000, mutate=True, permute_node_idx=True):
+    def generate(self, num_samples=5000, mutate=True, permute_node_idx=True, edge_weights=False):
         """
         Main function (generate synthetic dataset)
         :param num_samples: number of samples
         :param mutate: slightly randomize edges
         :param permute_node_idx: permute node indices
+        :param edge_weights: return edge weights
         :return: datasets of graphs
         """
         self.synthetic_dataset = []
@@ -125,21 +129,27 @@ class SyntheticGenerator:
             self.generate_graphs(self.crossAdj, self.cross_label, int(num_samples / 2), mutate)
             self.generate_graphs(self.circleAdj, self.snowflake_label, int(num_samples / 2), mutate)
 
-        return WrapperSynthetic(self.synthetic_dataset, self.num_nodes, self.classes)
+        edge_weight_list = None
+        #if edge_weights:
+        #    do
+
+        return WrapperSynthetic(self.synthetic_dataset, self.num_nodes, self.classes, edge_weight_list)
 
 
 class WrapperSynthetic:
 
-    def __init__(self, datasets, number_nodes_features, number_classes):
+    def __init__(self, datasets, number_nodes_features, number_classes, edge_weight_list):
         """
         Wrapper for Synthetic dataset
         :param datasets: list dataset
         :param number_nodes_features: number of features per node
         :param number_classes: number of classes
+        :param edge_weight_list: edge weights list
         """
         self.dataset = datasets
         self.num_node_features = number_nodes_features
         self.num_classes = number_classes
+        self.edge_weights = edge_weight_list
 
     def __getitem__(self, item):
         """
