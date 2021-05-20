@@ -15,6 +15,17 @@ class SyntheticGenerator:
         high = 0.99  # probability of generating true edge
 
         # define base graph shapes
+        # circle graph (shaped like O)
+        self.circleAdj = np.array([[low,high,low,low,low,low,low,low,high],
+                                     [0,low,high,low,low,low,low,low,low],
+                                     [0,0,low,high,low,low,low,low,low],
+                                     [0,0,0,low,high,low,low,low,low],
+                                     [0,0,0,0,low,high,low,low,low],
+                                     [0,0,0,0,0,low,high,low,low],
+                                     [0,0,0,0,0,0,low,high,low],
+                                     [0,0,0,0,0,0,0,low,high],
+                                     [0,0,0,0,0,0,0,0,low]])
+
         # cross graph (shaped like X)
         self.crossAdj = np.array([[low,high,low,high,low,high,low,high,low],
                                   [0,low,high,low,low,low,low,low,low],
@@ -25,7 +36,7 @@ class SyntheticGenerator:
                                   [0,0,0,0,0,0,low,low,low],
                                   [0,0,0,0,0,0,0,low,high],
                                   [0,0,0,0,0,0,0,0,low]])
-        # snowflake graph (shaped like *)
+        # snowflake graph (shaped like *, currently unused)
         self.snowflakeAdj = np.array([[low,high,high,high,high,high,high,high,high],
                                       [0,low,low,low,low,low,low,low,low],
                                       [0,0,low,low,low,low,low,low,low],
@@ -35,20 +46,10 @@ class SyntheticGenerator:
                                       [0,0,0,0,0,0,low,low,low],
                                       [0,0,0,0,0,0,0,low,low],
                                       [0,0,0,0,0,0,0,0,low]])
-        # circle graph (shaped like O, currently unused)
-        self.circleAdj = np.array([[low,high,low,low,low,low,low,low,high],
-                                   [0,low,high,low,low,low,low,low,low],
-                                   [0,0,low,high,low,low,low,low,low],
-                                   [0,0,0,low,high,low,low,low,low],
-                                   [0,0,0,0,low,high,low,low,low],
-                                   [0,0,0,0,0,low,high,low,low],
-                                   [0,0,0,0,0,0,low,high,low],
-                                   [0,0,0,0,0,0,0,low,high],
-                                   [0,0,0,0,0,0,0,0,low]])
         # define labels
-        self.cross_label = torch.tensor([0])
-        self.snowflake_label = torch.tensor([1])
-        self.circle_label = torch.tensor([2])
+        self.circle_label = torch.tensor([0])
+        self.cross_label = torch.tensor([1])
+        self.snowflake_label = torch.tensor([2])
 
         # define identity matrix
         self.identity = torch.tensor(np.identity(self.num_nodes))
@@ -107,18 +108,19 @@ class SyntheticGenerator:
         self.synthetic_dataset = []
 
         if permute_node_idx:
-            cross_adj = np.copy(self.crossAdj)
 
+            circle_adj = np.copy(self.circleAdj)
+            for i in range(self.num_nodes):
+                if i != 0:
+                    circle_adj = self.permute(circle_adj, self.cyclic)
+                self.generate_graphs(circle_adj, self.circle_label, int(num_samples / (2 * self.num_nodes)), mutate)
+
+            cross_adj = np.copy(self.crossAdj)
             for i in range(self.num_nodes):
                 if i != 0:
                     cross_adj = self.permute(cross_adj, self.cyclic)
                 self.generate_graphs(cross_adj, self.cross_label, int(num_samples / (2 * self.num_nodes)), mutate)
 
-            snowflake_adj = np.copy(self.circleAdj)
-            for i in range(self.num_nodes):
-                if i != 0:
-                    snowflake_adj = self.permute(snowflake_adj, self.cyclic)
-                self.generate_graphs(snowflake_adj, self.snowflake_label, int(num_samples / (2 * self.num_nodes)), mutate)
         else:
             self.generate_graphs(self.crossAdj, self.cross_label, int(num_samples / 2), mutate)
             self.generate_graphs(self.circleAdj, self.snowflake_label, int(num_samples / 2), mutate)
