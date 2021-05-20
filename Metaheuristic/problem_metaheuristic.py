@@ -1,6 +1,5 @@
 from MetaHeuristics.Problems.interface_problem import Problem_Interface
 import numpy as np
-import torch
 
 
 class Problem(Problem_Interface):
@@ -10,7 +9,7 @@ class Problem(Problem_Interface):
         https://github.com/ipmach/MetaHeuristics.git
     """
 
-    def __init__(self, graph, batch, model, index, weights_size):
+    def __init__(self, graph, batch, model, index, weights_size, solver):
         """
         Class adapter
         :param graph: target graph
@@ -18,6 +17,7 @@ class Problem(Problem_Interface):
         :param model: model used
         :param index: index of last layer neuron
         :param weights_size: numbers of the edges weights
+        :param solver: solver function use
         """
         self.graph = graph
         self.batch = batch
@@ -25,6 +25,7 @@ class Problem(Problem_Interface):
         self.index = index
         self.weights_size = weights_size
         self.always_multiple = False
+        self.solver = solver
 
     def give_random_point(self):
         """
@@ -82,8 +83,7 @@ class Problem(Problem_Interface):
         :return: solution
         """
         i = 1 if real else -1  # The original heuristic are minimizing
-        return i * float(self.model(self.graph.x, self.graph.edge_index, self.batch,
-                                    torch.Tensor(x))[0][self.index].detach().numpy())
+        return i * self.solver(self.model, self.graph, self.batch, self.index, x)
 
     def __call__(self, x, multiple=False, real=False):
         """
@@ -101,29 +101,3 @@ class Problem(Problem_Interface):
         else:
             return self.solve(x, real=real)
 
-
-class NonEncode:
-
-    def __init__(self):
-        """
-        Use as encode for some of the metaheuristics
-        """
-        self.dec2binv = lambda x: [self.dec2bin(i) for i in x]
-        self.bin2decv = lambda x: [self.bin2dec(i) for i in x]
-
-    def dec2bin(self, x):
-        """
-        Convert from space problem to metaheuristic encoding
-        :param x: point in the problem space
-        :return: point in the metaheuristic encoding
-        """
-        x = np.array(x)
-        return "".join(list(x.astype(str)))
-
-    def bin2dec(self, x):
-        """
-        Convert from metaheuristic encoding to space problem
-        :param x: point in the metaheuristic encoding
-        :return: point in the problem space
-        """
-        return np.array(list(x)).astype(int)
