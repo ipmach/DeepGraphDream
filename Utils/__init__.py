@@ -38,6 +38,7 @@ def view_graph_masked(data, mask, mask_weights=None, with_labels=True, figsize=(
         print("#   Label:", y, "             #")
         print("###########################")
         # plot graph
+        mask_weights = mask_weights[mask_weights>0]
         plt.figure(figsize=figsize)
         nx.draw(g, labels=labels, with_labels=with_labels, width=mask_weights)
         return int(edges), int(nodes)
