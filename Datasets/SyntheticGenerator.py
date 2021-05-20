@@ -11,40 +11,40 @@ class SyntheticGenerator:
 
         self.num_nodes = 9  # all graphs have exactly 9 nodes
         self.classes = 2  # Number of classes
-        low = 0.01
-        high = 0.99
+        low = 0.01  # probability of generating false edge
+        high = 0.99  # probability of generating true edge
 
         # define base graph shapes
         # cross graph (shaped like X)
         self.crossAdj = np.array([[low,high,low,high,low,high,low,high,low],
-                                  [low,low,high,low,low,low,low,low,low],
-                                  [low,low,low,low,low,low,low,low,low],
-                                  [low,low,low,low,high,low,low,low,low],
-                                  [low,low,low,low,low,low,low,low,low],
-                                  [low,low,low,low,low,low,high,low,low],
-                                  [low,low,low,low,low,low,low,low,low],
-                                  [low,low,low,low,low,low,low,low,high],
-                                  [low,low,low,low,low,low,low,low,low]])
+                                  [0,low,high,low,low,low,low,low,low],
+                                  [0,0,low,low,low,low,low,low,low],
+                                  [0,0,0,low,high,low,low,low,low],
+                                  [0,0,0,0,low,low,low,low,low],
+                                  [0,0,0,0,0,low,high,low,low],
+                                  [0,0,0,0,0,0,low,low,low],
+                                  [0,0,0,0,0,0,0,low,high],
+                                  [0,0,0,0,0,0,0,0,low]])
         # snowflake graph (shaped like *)
         self.snowflakeAdj = np.array([[low,high,high,high,high,high,high,high,high],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low],
-                                      [low,low,low,low,low,low,low,low,low]])
+                                      [0,low,low,low,low,low,low,low,low],
+                                      [0,0,low,low,low,low,low,low,low],
+                                      [0,0,0,low,low,low,low,low,low],
+                                      [0,0,0,0,low,low,low,low,low],
+                                      [0,0,0,0,0,low,low,low,low],
+                                      [0,0,0,0,0,0,low,low,low],
+                                      [0,0,0,0,0,0,0,low,low],
+                                      [0,0,0,0,0,0,0,0,low]])
         # circle graph (shaped like O, currently unused)
         self.circleAdj = np.array([[low,high,low,low,low,low,low,low,high],
-                                   [low,low,high,low,low,low,low,low,low],
-                                   [low,low,low,high,low,low,low,low,low],
-                                   [low,low,low,low,high,low,low,low,low],
-                                   [low,low,low,low,low,high,low,low,low],
-                                   [low,low,low,low,low,low,high,low,low],
-                                   [low,low,low,low,low,low,low,high,low],
-                                   [low,low,low,low,low,low,low,low,high],
-                                   [low,low,low,low,low,low,low,low,low]])
+                                   [0,low,high,low,low,low,low,low,low],
+                                   [0,0,low,high,low,low,low,low,low],
+                                   [0,0,0,low,high,low,low,low,low],
+                                   [0,0,0,0,low,high,low,low,low],
+                                   [0,0,0,0,0,low,high,low,low],
+                                   [0,0,0,0,0,0,low,high,low],
+                                   [0,0,0,0,0,0,0,low,high],
+                                   [0,0,0,0,0,0,0,0,low]])
         # define labels
         self.cross_label = torch.tensor([0])
         self.snowflake_label = torch.tensor([1])
