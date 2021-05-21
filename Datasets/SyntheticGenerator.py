@@ -118,7 +118,7 @@ class SyntheticGenerator:
                     break
                 if edge_found:
                   weights[i] = 1.
-
+              graph.edge_weights = torch.tensor(weights).float()
               self.edge_weight_list.append(weights)
 
 
