@@ -1,4 +1,5 @@
 from torch_geometric.utils import dense_to_sparse
+from Datasets.wrapper import WrapperSynthetic
 from torch_geometric import data
 import numpy as np
 import random
@@ -154,42 +155,3 @@ class SyntheticGenerator:
             self.generate_graphs(self.circleAdj, self.snowflake_label, int(num_samples / 2), mutate, edge_weights)
 
         return WrapperSynthetic(self.synthetic_dataset, self.num_nodes, self.classes, self.edge_weight_list)
-
-
-class WrapperSynthetic:
-
-    def __init__(self, datasets, number_nodes_features, number_classes, edge_weight_list):
-        """
-        Wrapper for Synthetic dataset
-        :param datasets: list dataset
-        :param number_nodes_features: number of features per node
-        :param number_classes: number of classes
-        :param edge_weight_list: edge weights list
-        """
-        self.dataset = datasets
-        self.num_node_features = number_nodes_features
-        self.num_classes = number_classes
-        self.edge_weights = edge_weight_list
-
-    def __getitem__(self, item):
-        """
-        Get graph from dataset
-        :param item: index item
-        :return: graph
-        """
-        return self.dataset[item]
-
-    def __len__(self):
-        """
-        Return size of the dataset
-        :return: size of the dataset
-        """
-        return len(self.dataset)
-
-    def shuffle(self):
-        """
-        Shuffle list
-        :return: the object
-        """
-        random.shuffle(self.dataset)
-        return self
