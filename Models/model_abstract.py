@@ -40,7 +40,7 @@ class Model(torch.nn.Module):
 
     def train_step(self, train_loader):
         """
-        Train step (redefine if model work diferent)
+        Train step (redefine if model work different)
         :param train_loader: train loader
         :return: None
         """
@@ -54,7 +54,7 @@ class Model(torch.nn.Module):
 
     def test_step(self, test_loader):
         """
-        Test step (redefine if model work diferent)
+        Test step (redefine if model work different)
         :param test_loader: test loader
         :return: accuracy
         """

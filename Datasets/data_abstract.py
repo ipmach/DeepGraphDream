@@ -40,15 +40,15 @@ class DataClass(ABC):
         torch.manual_seed(seed)
         self.dataset = self.dataset.shuffle()
 
-    def get_loader(self, train_porcentage=0.75, batch_size=64):
+    def get_loader(self, train_percentage=0.75, batch_size=64):
         """
         Pass data to the loaders
-        :param train_porcentage: porcentage to use in train
+        :param train_percentage: percentage to use in train
         :param batch_size: size of the batch size
         :return: train_loader, test_loader
         """
-        train_dataset = self.dataset[:int(len(self.dataset) * train_porcentage)]
-        test_dataset = self.dataset[int(len(self.dataset) * train_porcentage):]
+        train_dataset = self.dataset[:int(len(self.dataset) * train_percentage)]
+        test_dataset = self.dataset[int(len(self.dataset) * train_percentage):]
 
         train_loader = DataLoader(train_dataset,
                                   batch_size=batch_size, shuffle=True)
