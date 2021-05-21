@@ -68,6 +68,38 @@ We use different metaheuristics for this approach working with the edge binary r
 
 ### Solution space and score definition
 
-We define a solution space and a score.
+We define a solution space and a score for multiple dimensions. The solution space is [0,1]^n where n is the number of neurons we have in that layer. The score is 0 if there is no improve, 1 if there was a perfect improvement and -1 if the improvement was the worst possible.
 
 <img src="https://github.com/ipmach/DeepGraphDream/blob/main/Documentation/score.png" alt="drawing" width="600"/>
+
+## Example usage
+
+
+``` python
+# External library
+from MetaHeuristics.Metaheuristics.simulated_anneling import SimmulatedAnneling
+# Internal libraries
+from Metaheuristic.edges2binary import Edges2binary, score
+from Metaheuristic.problem_metaheuristic import Problem
+from Metaheuristic.encode import NonEncode
+
+
+def solver(model, graph, batch, index, x):
+   m = torch.nn.Softmax(dim=1)
+   return  score(old, m(model(graph.x, 
+                             Edges2binary.convert_edges(x, edge_index), 
+                             batch)), index)
+                             
+index = 1  # Select neuron we want to increase value
+
+# Initialize Problem
+problem = Problem(graph, batch, model, index, len(initial_solution), solver)
+
+# Initialize Encode
+encode = NonEncode()
+
+# Apply metaheuristic for deepdream
+solver = SimmulatedAnneling(problem, reduction='geometric')
+_, iterations_SA = solver(solution=initial_solution, max_iter=2000, T=200)
+
+````
