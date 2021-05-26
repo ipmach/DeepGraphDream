@@ -1,8 +1,12 @@
-import numpy as np
+import os
+import imageio
 import torch
-
+import numpy as np
 import matplotlib.pyplot as plt
+
+from IPython.display import Image
 from Models.model_abstract import Model
+
 
 class Dreamer(torch.nn.Module):
     def __init__(self, base_model):
@@ -38,6 +42,8 @@ class Dreamer(torch.nn.Module):
         loss_list = []
         softmax_zero = []
         softmax_one = []
+        files_bars = []
+        files_lines = []
 
         for i in range(steps):
           #print(i)
@@ -69,7 +75,31 @@ class Dreamer(torch.nn.Module):
             print("i {}".format(i))
             print("no grad ? {}".format(mask.grad))
           mask = torch.clip(mask, 0, 1)
+          
+          if i % 2 == 0:
+            filename = 'bar{}_.png'.format(i)
+            files_bars.append(filename)
+            plt.ylim(0, 1)
+            plt.bar(range(len(mask)), mask.detach().numpy())
+            plt.savefig(filename, bbox_inches='tight')
+            plt.clf()
+
+            filename = 'lines{}_.png'.format(i)
+            plt.subplot(1, 2, 1)
+            plt.plot(loss_list, label='activation to maximize')
+            plt.legend()
+
+            plt.subplot(1, 2, 2)
+            plt.plot(softmax_zero, label='softmax_zero')
+            plt.plot(softmax_one, label='softmax_one')
+            plt.legend()
+            plt.savefig(filename, bbox_inches='tight')
+            files_lines.append(filename)
+            plt.clf()
+
+            #visualize_new_graph(example, new_weights)
           mask = torch.autograd.Variable(mask, requires_grad=True)
+
         print("weights end\n {}".format(mask))
         plt.plot(loss_list, label='activation to maximize')
         plt.legend()
@@ -78,8 +108,23 @@ class Dreamer(torch.nn.Module):
         plt.plot(softmax_one, label='softmax_one')
         plt.legend()
         plt.show()
-
+        
         print("Weights after dreaming")
         plt.bar(range(len(mask)), mask.detach().numpy())
         plt.show()
+        self.files_bars = files_bars
+        self.files_lines = files_lines
         return mask
+    
+    def generate_bars_gif(self, remove_files=True):
+      for gif_name, filenames in [('bar.gif', self.files_bars), ('lines.gif', self.files_lines)]:
+        with imageio.get_writer(gif_name, mode='I') as writer:
+          for filename_ in filenames:
+            image = imageio.imread(filename_)
+            writer.append_data(image)
+          
+          # Remove files
+          if remove_files:
+            for filename_ in set(filenames):
+              os.remove(filename_)
+
