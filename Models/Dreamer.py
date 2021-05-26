@@ -22,7 +22,7 @@ class Dreamer(torch.nn.Module):
       return hook
 
     def forward(self, x, nodes, target_label, use_edge_loss=True,
-                mask=None, random_mask=False, steps=400):
+                mask=None, random_mask=False, save_evolution=False, steps=400):
         model = self.model
         batch = torch.zeros([nodes]).type(torch.int64)
         print(batch.shape)
@@ -76,7 +76,7 @@ class Dreamer(torch.nn.Module):
             print("no grad ? {}".format(mask.grad))
           mask = torch.clip(mask, 0, 1)
           
-          if i % 2 == 0:
+          if save_evolution and (i % 2 == 0):
             filename = 'bar{}_.png'.format(i)
             files_bars.append(filename)
             plt.ylim(0, 1)
