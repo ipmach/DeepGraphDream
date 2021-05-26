@@ -50,8 +50,14 @@ class Dreamer(torch.nn.Module):
             mask.grad.data.zero_()
 
           fc_zero = self.activation['final_fc']
-          loss = torch.mean((fc_zero[:, target_label]))
-          loss_list.append(loss.item())
+          activation_loss = torch.mean((fc_zero[:, target_label]))
+          loss_list.append(activation_loss.item())
+          sum_edges = torch.sum(mask)
+          if target_label == 0:
+              away_from_edges = (9 - sum_edges)**2
+          else:
+              away_from_edges = (8 - sum_edges)**2
+          loss = activation_loss + away_from_edges
           loss.backward()
           try:
             mask = mask + (0.005 * mask.grad.data)
