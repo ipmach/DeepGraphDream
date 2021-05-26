@@ -54,9 +54,9 @@ class Dreamer(torch.nn.Module):
           loss_list.append(activation_loss.item())
           sum_edges = torch.sum(mask)
           if target_label == 0:
-              away_from_edges = (9 - sum_edges)**2
+              away_from_edges = -(9 - sum_edges)**2
           else:
-              away_from_edges = (8 - sum_edges)**2
+              away_from_edges = -(8 - sum_edges)**2
           loss = activation_loss + away_from_edges
           loss.backward()
           try:
